@@ -1,22 +1,19 @@
-# EC downstream task
+# EC-number classification
 
-The public EC workflow uses frozen protein representations and a deterministic
-k-nearest-neighbour multi-label readout. It does not train an EC classifier.
+The released EC evaluation is a deterministic, training-free cosine k-nearest
+neighbour readout over frozen protein embeddings. The paper protocol fixes
+`k=1` and uses `split100` as the reference gallery.
 
-The default protocol uses `split100` as the reference gallery and evaluates
-queries from `NEW`, `PRICE`, and `split10`. The `split10` query uses the same
-`split100` gallery and excludes an identical query entry when present.
-
-Run from the repository root:
+From the repository root, run:
 
 ```bash
-PYTHONPATH=src python tasks/downstream/ec/sweep/sweep.py \
-  --config configs/downstream/ec/esm2_650M.yaml
+python knn_ec.py --config config_enzsub06B.yaml
 ```
 
-The command expects the Zenodo data, embeddings/checkpoints, and the paths in
-the selected configuration. It writes only derived outputs under `artifacts/`.
+The configuration evaluates the four ESM2-650M representation states (Base,
+CPT, Base-SUB, and CPT-SUB) on NEW-392 and PRICE-149. It reads labels from
+`data/ec/`, embeddings from `embeddings/ec/06B/`, and writes derived results to
+`artifacts/downstream/ec/results/enzsub06B/`.
 
-The embedding exporter supports the four representation states `base`, `cpt`,
-`base_sub`, and `cpt_sub`. `knn_eval.py` can also evaluate previously released
-embedding directories without loading a protein encoder.
+The script verifies input coverage before evaluation and exits with an error if
+any reproduced MCC differs from the archived paper result.

@@ -1,10 +1,11 @@
 # EC input data
 
-The EC FASTA/CSV inputs are external Zenodo artifacts and are not committed to
-Git. The expected files are:
+Place the released EC label tables in this directory:
 
-- `split100.fasta` and `split100.csv` for the reference gallery;
-- `split10.csv`, `new.csv`, and `price.csv` for query evaluation;
-- matching FASTA files for embedding extraction.
+- `split100.csv`: reference gallery;
+- `new.csv`: NEW-392 query set;
+- `price.csv`: PRICE-149 query set.
 
-Download and verify them using the root data manifest before running the task.
+Sequence FASTA files are not required for the released-embedding reproduction
+workflow. The expected archive and checksums will be recorded in the root data
+manifest when the public data record is finalized.

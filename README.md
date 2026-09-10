@@ -84,6 +84,17 @@ The same entry point accepts every Base-SUB and CPT-SUB configuration under
 
 ## Evaluation and analyses
 
+The ESM2-650M EC-number results can be reproduced directly from the released
+embeddings. No model checkpoint, GPU, or embedding-generation step is required:
+
+```bash
+python knn_ec.py --config config_enzsub06B.yaml
+```
+
+This command evaluates Base, CPT, Base-SUB, and CPT-SUB on NEW-392 and
+PRICE-149 with the paper setting `k=1`. It also checks every MCC value against
+the archived paper run and writes the full metric table under `artifacts/`.
+
 Task-specific commands and artifact requirements are documented under
 `tasks/downstream/`, `tasks/transfer/`, and `tasks/analysis/`. The downstream
 collection covers EC prediction, enzyme-substrate specificity, active-site

@@ -1,0 +1,40 @@
+backbone: ESM2-650M
+
+embedding_root: embeddings/ec/06B
+states:
+  Base: esm2_t33_650M_base
+  CPT: esm2_t33_650M_cpt
+  Base-SUB: base_sub
+  CPT-SUB: cpt_sub
+
+embedding_files:
+  NEW-392: new_all.pt
+  PRICE-149: price_all.pt
+
+data:
+  gallery: data/ec/split100.csv
+  queries:
+    NEW-392: data/ec/new.csv
+    PRICE-149: data/ec/price.csv
+
+evaluation:
+  k: 1
+
+output_dir: artifacts/downstream/ec/results/enzsub06B
+
+# MCC values from the archived paper run. The script fails if reproduction
+# differs beyond floating-point tolerance.
+expected_mcc:
+  Base:
+    NEW-392: 0.5442849575560846
+    PRICE-149: 0.34417193142006963
+  CPT:
+    NEW-392: 0.5496367877249393
+    PRICE-149: 0.34978923457978206
+  Base-SUB:
+    NEW-392: 0.5997140401422871
+    PRICE-149: 0.41719481245043855
+  CPT-SUB:
+    NEW-392: 0.6023407120246386
+    PRICE-149: 0.44017019709133404
+reference_tolerance: 1.0e-6
