@@ -1,0 +1,25 @@
+backbone: ESM2-650M
+embedding_root: embeddings/esp/06B
+states:
+  Base: esm2_t33_650M_base
+  CPT: esm2_t33_650M_cpt
+  Base-SUB: esm2_t33_650M_base_sub
+  CPT-SUB: esm2_t33_650M_cpt_sub
+
+files:
+  train: processed_train_final_with_smiles.pkl
+  test: processed_test_final_with_smiles.pkl
+
+seeds: [2026, 2025, 3047]
+device: cuda:0
+mlp:
+  hidden_dims: [512, 256, 128]
+  dropout: 0.4
+  lr: 0.0005
+  weight_decay: 1.0e-4
+  batch_size: 128
+  max_epochs: 100
+  patience: 5
+  clip_grad: 1.0
+
+output_dir: artifacts/downstream/esp/results/enzsub06B

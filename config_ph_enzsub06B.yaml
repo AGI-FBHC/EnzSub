@@ -1,0 +1,30 @@
+backbone: ESM2-650M
+embedding_root: embeddings/pH/06B
+states:
+  Base: esm2_t33_650M_base
+  CPT: esm2_t33_650M_cpt
+  Base-SUB: esm2_t33_650M_base_sub
+  CPT-SUB: esm2_t33_650M_cpt_sub
+
+data:
+  train: data/ph/processed/train.csv
+  val: data/ph/processed/val.csv
+  test: data/ph/processed/test.csv
+
+seeds: [2025, 2026, 3047]
+xgboost:
+  n_estimators: 800
+  max_depth: 4
+  learning_rate: 0.05
+  subsample: 1.0
+  colsample_bytree: 0.8
+  min_child_weight: 3
+  gamma: 0.0
+  reg_alpha: 0.0
+  reg_lambda: 3.0
+  colsample_bylevel: 1.0
+  colsample_bynode: 1.0
+  tree_method: approx
+  n_jobs: 1
+
+output_dir: artifacts/downstream/ph/results/enzsub06B
