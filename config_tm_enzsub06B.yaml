@@ -1,0 +1,27 @@
+device: cuda:0
+encoder_type: esm2_t33_650M
+
+data:
+  train_csv: data/tm/train.csv
+  val_csv: data/tm/val.csv
+  test_csv: data/tm/test.csv
+
+emb_root: embeddings/tm/06B
+
+models:
+  esm2_t33_650M_base:
+    mode: base
+  esm2_t33_650M_cpt:
+    mode: cpt
+  esm2_t33_650M_base_sub:
+    mode: base_sub
+  esm2_t33_650M_cpt_sub:
+    mode: cpt_sub
+
+eval:
+  seeds: [2025, 2026, 3047]
+  methods: [xgboost]
+  xgboost:
+    cv_folds: 0
+
+results_root: artifacts/downstream/tm/results/enzsub06B

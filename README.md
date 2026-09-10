@@ -95,17 +95,19 @@ This command evaluates Base, CPT, Base-SUB, and CPT-SUB on NEW-392 and
 PRICE-149 with the paper setting `k=1`. It also checks every MCC value against
 the archived paper run and writes the full metric table under `artifacts/`.
 
-The ESM2-650M optimum-pH and ESP results use the same released-embedding
-layout and the three paper seeds:
+The ESM2-650M optimum-pH, ESP, Tm, and active-site results use the same
+released-embedding layout and the three paper seeds:
 
 ```bash
 python ph.py --config config_ph_enzsub06B.yaml
 python esp.py --config config_esp_enzsub06B.yaml
+python tm.py --config config_tm_enzsub06B.yaml
+python active_site.py --config config_active_site_enzsub06B.yaml
 ```
 
-The pH command trains the fixed XGBoost readout on CPU. The ESP command trains
-the fixed MLP readout on the configured GPU. Neither command regenerates
-protein or molecular embeddings.
+The pH and Tm commands train their fixed XGBoost readouts on CPU. ESP and
+active-site train the fixed MLP readouts on the configured GPU. None of these
+commands regenerates protein or molecular embeddings.
 
 Task-specific commands and artifact requirements are documented under
 `tasks/downstream/`, `tasks/transfer/`, and `tasks/analysis/`. The downstream
