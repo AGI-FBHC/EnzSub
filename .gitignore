@@ -32,3 +32,6 @@ data/esp/*
 data/embeddings/
 data/private/
 *.log
+
+/embeddings/*
+!/embeddings/README.md
