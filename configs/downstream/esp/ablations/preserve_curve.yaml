@@ -1,0 +1,102 @@
+# ESP enzyme-substrate binding sweep configuration.
+
+experiment:
+  name: preserve_curve
+  results_root: artifacts/downstream/esp/paper-results
+
+device: "cuda:0"
+batch_size: 8
+max_len: 1022
+
+data:
+  train_pkl: artifacts/downstream/esp/data/train.pkl
+  test_sets:
+    ID_Test: artifacts/downstream/esp/data/test.pkl
+
+models:
+  # ---- 无 SUB ----
+  esm2_t33_650M_base:
+    encoder_type: esm2_t33_650M
+    mode: base
+  esm2_t33_650M_cpt:
+    encoder_type: esm2_t33_650M
+    mode: cpt
+    checkpoint: checkpoints/cpt/esm2_650M_step_40000.pt
+  cpt_sub_pre01:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre01/checkpoint_epoch15.pt
+  cpt_sub_pre03:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre03/checkpoint_epoch15.pt
+  cpt_sub_pre05:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre05/checkpoint_epoch15.pt
+  cpt_sub_pre08:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre08/checkpoint_epoch15.pt
+  cpt_sub_pre10:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre10/checkpoint_epoch15.pt
+
+  cpt_sub_pre12:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre12/checkpoint_epoch15.pt
+  cpt_sub_pre15:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre15/checkpoint_epoch15.pt
+
+  cpt_sub_r16_ecfp:
+    encoder_type: esm2_t33_650M
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/esm2_650M_cpt_sub.pt
+
+chemberta:
+  enabled: true
+  batch_size: 64
+  max_length: 128
+
+eval:
+  methods: [mlp]
+  seeds: [2026]
+  cv: true
+  cv_splits: 5
+  mol_feature: ecfp
+
+  gbdt:
+    num_round: 1000
+    early_stopping_rounds: 50
+    max_depth: 10
+    min_child_weight: 8
+    max_delta_step: 1.0
+    eta: 0.05
+    alpha: 2.0
+    lambda_: 1.0
+    neg_weight: 0.14
+    xgb_device: "cuda:0"
+    sampling_method: uniform
+    max_bin: 256
+    subsample: 0.9
+    colsample_bytree: 0.8
+
+  mlp:
+    hidden_dims: [512, 256,128]
+    dropout: 0.4
+    use_residual: false
+    lr: 0.0005
+    weight_decay: 1.0e-4
+    batch_size: 128
+    max_epochs: 100
+    patience: 5
+    clip_grad: 1.0
+    torch_device: "cuda:0"
+
+knn:
+  k_values: [1]
+  batch_size: 256

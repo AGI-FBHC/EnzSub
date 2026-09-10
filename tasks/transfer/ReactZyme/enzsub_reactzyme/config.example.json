@@ -1,0 +1,45 @@
+{
+  "paths": {
+    "split_dir": "artifacts/transfer/reactzyme/data/seq_smi",
+    "artifacts_dir": "artifacts/transfer/reactzyme/features",
+    "results_dir": "artifacts/transfer/reactzyme/results",
+    "mat_checkpoint": "checkpoints/external/reactzyme_mat.pt",
+    "enzsub_code_root": "src"
+  },
+  "runtime": {
+    "python_bin": "python",
+    "device": "cuda:0",
+    "split_name": "seq_smi"
+  },
+  "negative_sampling": {
+    "seed": 2025,
+    "per_positive": 1,
+    "candidate_pool": 1000,
+    "selection": "uniform_eligible_from_top_pool"
+  },
+  "training": {
+    "seeds": [47, 48, 49, 50, 51],
+    "batch_size": 512,
+    "accumulation_steps": 1,
+    "max_epochs": 50,
+    "patience": 5,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.001,
+    "validation_fraction": 0.1
+  },
+  "evaluation": {
+    "metrics": ["map", "ndcg", "topk"],
+    "topk": [1, 3, 5, 10]
+  },
+  "models": [
+    {
+      "name": "enzsub_650m_cpt_sub",
+      "kind": "enzsub",
+      "encoder_type": "esm2_650m",
+      "model_mode": "cpt_sub",
+      "checkpoint": "checkpoints/sub/esm2_650M_cpt_sub.pt",
+      "batch_size": 8
+    }
+  ],
+  "comparison_models": ["enzsub_650m_cpt_sub"]
+}

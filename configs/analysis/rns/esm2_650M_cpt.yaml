@@ -1,0 +1,21 @@
+real_fasta: data/rns/ENZ30_val.fasta
+random_fasta: data/rns/ENZ30_val_random.fasta
+output_dir: artifacts/analysis/rns/results_{encoder}_{cmp}_bf16
+
+encoder_type: esm2_t33_650M
+compare_mode: cpt
+compare_checkpoint: checkpoints/cpt/esm2_650M_step_40000.pt
+lora_rank: 16
+lora_alpha: 32
+
+device: cuda:0
+batch_size: 4
+max_len: 1022
+use_fp16: true
+force_recompute: false
+
+k_list: [100, 500, 1000]
+rns_n_iterations: 100
+rns_balance_pool: true
+rns_seed: 42
+sub_package_parent: src

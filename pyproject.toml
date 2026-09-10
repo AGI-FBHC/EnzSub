@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "enzsub"
+version = "0.1.0"
+description = "Reproducible training and evaluation code for EnzSub"
+requires-python = ">=3.8"
+authors = [
+  {name = "JkBai"},
+  {name = "AGI&FBHC Laboratory"},
+]
+dependencies = [
+  "numpy",
+  "pandas",
+  "PyYAML",
+  "scipy",
+  "scikit-learn",
+  "torch",
+  "tqdm",
+  "transformers==4.46.3",
+  "fair-esm==2.0.0",
+  "wandb",
+]
+
+[project.optional-dependencies]
+downstream = [
+  "matplotlib",
+  "xgboost",
+  "lightgbm",
+  "python-Levenshtein",
+  "requests",
+  "torch-geometric",
+  "torchmetrics",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

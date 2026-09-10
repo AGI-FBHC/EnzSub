@@ -1,0 +1,97 @@
+# =============================================================================
+# ESM2-3B substrate-neighborhood coherence analysis
+# 配置文件示例 — enzyme-only 近邻底物化学一致性分析 (论文 §2.3 表示层证据)
+#
+# 用法:
+#   python 3_analyze_substrate_neighborhood_coherence.py \
+#       --config configs/analysis/substrate_coherence/esm2_3B.yaml
+#
+# CLI 参数会覆盖此文件中的对应项；backbone / mode 必须在此显式声明，
+# 绝不靠文件名猜测 (spec §5/§17)。
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 参与分析的模型。
+# 每个模型必须提供:
+#   backbone : 用于「分桶」近邻空间 + 输出标注。不同 backbone 维度不同，
+#              绝不混在同一近邻空间 (spec §5)。
+#   mode     : base / cpt / base_sub / cpt_sub —— 决定 primary/secondary 归类。
+#   pkl      : 该模型的 enzyme embedding pkl (sweep Step 1 产物)，
+#              即 results/<exp>/_embeddings/<model_name>/ID_Test.pkl。
+#              只需含 sequence / SMILES / Binding / enzyme_vector；
+#              ChemBERTa_vector 即使存在也不会被本分析使用。
+#
+# pkl 路径也可改用 CLI --model-files name=path 覆盖，便于脚本化批量跑。
+# -----------------------------------------------------------------------------
+models:
+  esm2_650m_base:
+    backbone: esm2_650m
+    mode: base
+    pkl: artifacts/downstream/esp/esm2_t33_650M/_embeddings/esm2_t33_650M_base/test.pkl
+  esm2_650m_base_sub:
+    backbone: esm2_650m
+    mode: base_sub
+    pkl: artifacts/downstream/esp/esm2_t33_650M/_embeddings/esm2_t33_650M_base_sub/test.pkl
+  esm2_3B_base:
+    backbone: esm2_3b
+    mode: base
+    pkl: artifacts/downstream/esp/esm2_t36_3B/_embeddings/esm2_t36_3B_base/test.pkl
+  esm2_3B_base_sub:
+    backbone: esm2_3b
+    mode: base_sub
+    pkl: artifacts/downstream/esp/esm2_t36_3B/_embeddings/esm2_t36_3B_base_sub/test.pkl
+
+  protbert_base:
+    backbone: protbert_bfd
+    mode: base
+    pkl: artifacts/downstream/esp/protbert/_embeddings/protbert_base/test.pkl
+  protbert_base_sub:
+    backbone: protbert_bfd
+    mode: base_sub
+    pkl: artifacts/downstream/esp/protbert/_embeddings/protbert_base_sub/test.pkl
+
+# -----------------------------------------------------------------------------
+# 配对比较，格式 "model_a:model_b" (a=base 侧, b=sub 侧)。
+# base vs base_sub 会被自动标为 primary；其余标为 secondary。
+# Base 与 SUB 共享同一 query cohort、同一底物注释、同一随机抽样索引 (严格配对)。
+# -----------------------------------------------------------------------------
+comparisons:
+  - esm2_3B_base:esm2_3B_base_sub      # primary (§2.3 主结论)
+  # - esm2_650m_cpt:esm2_650m_cpt_sub        # secondary
+  # - esm2_650m_base:esm2_650m_cpt           # secondary (CPT 单独效应)
+
+# -----------------------------------------------------------------------------
+# 分析参数。CLI 同名参数优先。
+# -----------------------------------------------------------------------------
+analysis:
+  output_dir: artifacts/downstream/esp/substrate_coherence/esm2_t36_3B
+
+  # 近邻数；spec 要求至少 5/10/20/50
+  k_values: [5, 10, 20, 50]
+
+  homology_table: results/substrate_coherence/esm2_650m/mmseqs_hits.tsv
+  identity_cutoffs: [0.30, 0.40, 0.50]
+  min_alignment_coverage: 0.80
+
+  # 底物化学 (spec §8)：ECFP4-like Morgan fingerprint + Tanimoto，独立于 ChemBERTa。
+  fingerprint_radius: 2
+  fingerprint_bits: 2048
+
+  extra_set_metrics: [mean_pairwise, jaccard]
+
+  # 随机近邻基线 (spec §11)
+  random_repeats: 200
+
+  # 高频底物 / currency metabolite 过滤 (spec §12)。两者都会跑 filtered + unfiltered。
+  # currency_metabolite_file: configs/currency_metabolites.txt
+  max_substrate_enzyme_fraction: 0.01
+
+  # 近邻审计文件 neighbor_pairs.csv 用的 k (仅 unfiltered + c_sym，控制文件大小)
+  audit_k: 10
+
+  # 统计推断
+  n_boot: 2000      # query 自助法 CI 重采样次数
+  n_perm: 10000     # 符号翻转置换检验次数
+
+  batch_size: 256   # cosine 近邻分批大小
+  seed: 2026

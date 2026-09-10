@@ -1,0 +1,28 @@
+* text=auto
+
+*.py text eol=lf
+*.sh text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.fasta text eol=lf
+*.fa text eol=lf
+*.tsv text eol=lf
+*.csv text eol=lf
+
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pt binary
+*.pth binary
+*.bin binary
+*.ckpt binary
+*.h5 binary
+*.hdf5 binary
+*.joblib binary
+*.npy binary
+*.npz binary
+*.pkl binary
+*.pickle binary

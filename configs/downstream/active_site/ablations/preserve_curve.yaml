@@ -1,0 +1,70 @@
+device: "cuda:0"
+batch_size: 32
+encoder_type: esm2_t33_650M
+
+sub_parent_dir: src
+
+data:
+  train_fasta: data/active_site/Enzyme_active_sites_train.fasta
+  test_fasta:  data/active_site/Enzyme_active_sites_test.fasta
+  train_labels: data/active_site/Enzyme_active_sites_train.txt
+  test_labels:  data/active_site/Enzyme_active_sites_test.txt
+
+scripts:
+  generate_embedding: tasks/downstream/active_site/scripts/generate_per_residue_embeddings.py
+  train_kfold:        tasks/downstream/active_site/src/train_kfold.py
+  knn_active_site:    tasks/downstream/active_site/src/knn_active_site.py
+
+emb_root: artifacts/downstream/active_site/paper/embeddings/0.6B
+
+models:
+  esm2_t33_650M_base:
+    mode: base
+  esm2_t33_650M_cpt:
+    mode: cpt
+    checkpoint: checkpoints/cpt/esm2_650M_step_40000.pt
+  cpt_sub_pre01:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre01/checkpoint_epoch15.pt
+  cpt_sub_pre03:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre03/checkpoint_epoch15.pt
+  cpt_sub_pre05:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre05/checkpoint_epoch15.pt
+  cpt_sub_pre08:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre08/checkpoint_epoch15.pt
+  cpt_sub_pre10:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre10/checkpoint_epoch15.pt
+  cpt_sub_pre12:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre12/checkpoint_epoch15.pt
+  cpt_sub_pre15:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/outputs/esm2_t33_650M/preserve/cpt_sub_pre15/checkpoint_epoch15.pt
+  cpt_sub_r16_ecfp:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/esm2_650M_cpt_sub.pt
+
+eval:
+  methods: [mlp]
+  seeds: [2025, 2026, 3047]
+
+  mlp:
+    model_type: mlp
+    loss_type: focal
+    focal_alpha: 0.65
+    focal_gamma: 2.0
+    lr: 1e-3
+    batch_size: 16
+    dropout: 0.1
+    epochs: 35
+    patience: 4
+    n_splits: 5
+
+  knn:
+    ks: [1]
+
+results_root: artifacts/downstream/active_site/paper/preserve

@@ -1,0 +1,47 @@
+device: "cuda:0"
+batch_size: 16
+max_len: 1022
+max_tokens_per_batch: 8000
+encoder_type: esm2_t33_650M
+sub_parent_dir: src
+
+data:
+  raw_dir: data/ph/raw
+  processed_dir: data/ph/processed
+  splits: ["train", "val", "test"]
+  ph_min: 0.0
+  ph_max: 14.0
+  max_seq_length: 8000
+
+emb_root: artifacts/downstream/ph/embeddings/esm2_650M
+
+models:
+  base:
+    mode: base
+  cpt:
+    mode: cpt
+    checkpoint: checkpoints/cpt/esm2_650M_step_40000.pt
+  base_sub:
+    mode: base_sub
+    checkpoint: checkpoints/sub/esm2_650M_base_sub.pt
+  cpt_sub:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/esm2_650M_cpt_sub.pt
+
+xgboost:
+  n_estimators: 800
+  max_depth: 4
+  learning_rate: 0.05
+  subsample: 1.0
+  colsample_bytree: 0.8
+  min_child_weight: 3
+  gamma: 0.0
+  reg_alpha: 0.0
+  reg_lambda: 3.0
+  n_jobs: 1
+  tree_method: approx
+  early_stopping_rounds: 0
+  use_scaler: false
+  cv_folds: 0
+  seeds: [2025, 2026, 3047]
+  output_dir: artifacts/downstream/ph/results/esm2_650M

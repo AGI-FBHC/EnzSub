@@ -1,0 +1,105 @@
+# External PLM baselines for residue-level active-site prediction.
+#
+# The external generator writes one CPU-float32 Tensor[L,D] per protein under
+# repr_layer=-1.  The existing AS Dataset/probe/k-NN code consumes the files
+# unchanged.  Server paths follow the existing repository root layout.
+
+device: "cuda:0"
+max_len: 1022
+batch_size: 4
+encoder_type: ankh3_large
+
+sub_parent_dir: src
+
+data:
+  train_fasta: data/active_site/Enzyme_active_sites_train.fasta
+  test_fasta: data/active_site/Enzyme_active_sites_test.fasta
+  train_labels: data/active_site/Enzyme_active_sites_train.txt
+  test_labels: data/active_site/Enzyme_active_sites_test.txt
+
+scripts:
+  # Kept for compatibility with sweep.py; the launcher uses the external
+  # generator first and invokes sweep.py with --skip-embedding.
+  generate_embedding: tasks/downstream/active_site/scripts/generate_per_residue_embeddings.py
+  train_kfold: tasks/downstream/active_site/src/train_kfold.py
+  knn_active_site: tasks/downstream/active_site/src/knn_active_site.py
+
+emb_root: artifacts/downstream/active_site/embeddings/plm_baselines
+
+models:
+  ankh3_large:
+    source: external_plm
+    mode: base
+    encoder_type: ankh3_large
+    backend: hf_t5
+    model_id: ElnaggarLab/ankh3-large
+    # local_path: artifacts/external_models/ankh3-large
+    model_class: t5_encoder
+    tokenizer_class: t5
+    input_mode: raw
+    prefix: "[NLU]"
+    dtype: bfloat16
+    embed_dim: 1536
+    repr_layer: -1
+    max_len: 1022
+    batch_size: 2
+    token_budget: 2048
+    max_batch_size: 4
+    validate_token_count: true
+
+  prott5_xl:
+    source: external_plm
+    mode: base
+    encoder_type: prott5_xl
+    backend: hf_t5
+    model_id: Rostlab/prot_t5_xl_half_uniref50-enc
+    # local_path: artifacts/external_models/prot_t5_xl_half_uniref50-enc
+    model_class: t5_encoder
+    tokenizer_class: t5
+    input_mode: space_separated
+    prefix: ""
+    dtype: float16
+    embed_dim: 1024
+    repr_layer: -1
+    max_len: 1022
+    batch_size: 4
+    token_budget: 4096
+    max_batch_size: 8
+    validate_token_count: true
+
+  esm3_small:
+    source: external_plm
+    mode: base
+    encoder_type: esm3_small
+    backend: esm3
+    model_id: biohub/esm3-sm-open-v1
+    pretrained_name: esm3-sm-open-v1
+    dtype: bfloat16
+    embed_dim: 1536
+    repr_layer: -1
+    max_len: 1022
+    batch_size: 1
+    token_budget: 0
+    max_batch_size: 1
+
+eval:
+  methods: [mlp]
+  seeds: [2025, 2026, 3047]
+
+  mlp:
+    model_type: mlp
+    loss_type: focal
+    focal_alpha: 0.65
+    focal_gamma: 2.0
+    lr: 1.0e-3
+    weight_decay: 1.0e-4
+    batch_size: 16
+    dropout: 0.1
+    epochs: 35
+    patience: 4
+    n_splits: 5
+
+  knn:
+    ks: [1]
+
+results_root: artifacts/downstream/active_site/plm_baselines

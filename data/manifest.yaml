@@ -1,0 +1,55 @@
+schema_version: 1
+release_status: artifact_pending
+archive:
+  provider: Zenodo
+  record: null
+  doi: null
+  checksum_manifest: null
+
+repository_data:
+  - name: ph_labels_and_sequences
+    path: data/ph
+    used_by: [ph]
+  - name: tm_labels_and_sequences
+    path: data/tm
+    used_by: [tm]
+  - name: active_site_labels_and_sequences
+    path: data/active_site
+    used_by: [active_site]
+  - name: rns_input_sequences
+    path: data/rns
+    used_by: [rns]
+
+external_artifacts:
+  - name: cpt_training_data
+    path: data/cpt
+    used_by: [cpt]
+    status: pending_release
+  - name: sub_training_data
+    path: data/sub
+    used_by: [sub]
+    status: pending_release
+  - name: ec_data_embeddings_and_results
+    path: data/ec
+    additional_paths:
+      - artifacts/downstream/ec
+    used_by: [ec, hcft]
+    status: pending_release
+  - name: esp_processed_data_embeddings_and_results
+    path: data/esp
+    additional_paths:
+      - artifacts/downstream/esp
+    used_by: [esp, substrate_coherence]
+    status: pending_release
+  - name: model_checkpoints
+    path: checkpoints
+    used_by: [sub, downstream, transfer, rns]
+    status: pending_release
+  - name: transfer_benchmark_data_and_results
+    path: artifacts/transfer
+    used_by: [ReactZyme, Seq2Topt, UniKP]
+    status: pending_release
+  - name: rns_results_and_embeddings
+    path: artifacts/analysis/rns
+    used_by: [rns]
+    status: pending_release

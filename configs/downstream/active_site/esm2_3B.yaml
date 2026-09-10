@@ -1,0 +1,55 @@
+device: "cuda:0"
+batch_size: 8
+encoder_type: esm2_t36_3B
+
+sub_parent_dir: src
+
+data:
+  train_fasta: data/active_site/Enzyme_active_sites_train.fasta
+  test_fasta:  data/active_site/Enzyme_active_sites_test.fasta
+  train_labels: data/active_site/Enzyme_active_sites_train.txt
+  test_labels:  data/active_site/Enzyme_active_sites_test.txt
+
+scripts:
+  generate_embedding: tasks/downstream/active_site/scripts/generate_per_residue_embeddings.py
+  train_kfold:        tasks/downstream/active_site/src/train_kfold.py
+  knn_active_site:    tasks/downstream/active_site/src/knn_active_site.py
+
+emb_root: artifacts/downstream/active_site/paper/embeddings/3B
+
+models:
+  esm2_t36_3B_base:
+    mode: base
+
+  esm2_t36_3B_cpt:
+    mode: cpt
+    checkpoint: checkpoints/cpt/esm2_3B_step_40000.pt
+
+  esm2_t36_3B_base_sub:
+    mode: base_sub
+    checkpoint: checkpoints/sub/esm2_3B_base_sub.pt
+
+  esm2_t36_3B_cpt_sub:
+    mode: cpt_sub
+    checkpoint: checkpoints/sub/esm2_3B_cpt_sub.pt
+
+eval:
+  methods: [mlp]
+  seeds: [2025, 2026, 3047]
+
+  mlp:
+    model_type: mlp
+    loss_type: focal
+    focal_alpha: 0.65
+    focal_gamma: 2.0
+    lr: 1e-3
+    batch_size: 16
+    dropout: 0.1
+    epochs: 35
+    patience: 4
+    n_splits: 5
+
+  knn:
+    ks: [1]
+
+results_root: artifacts/downstream/active_site/paper/esm2_t36_3B

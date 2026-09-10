@@ -1,0 +1,29 @@
+name: enzsub
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pytorch=2.1.2
+  - pytorch-cuda=12.1
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - pyyaml
+  - matplotlib
+  - rdkit=2024.03.5
+  - xgboost
+  - lightgbm
+  - requests
+  - pip
+  - pip:
+      - fair-esm==2.0.0
+      - python-Levenshtein
+      - torch-geometric
+      - torchmetrics
+      - tqdm
+      - transformers==4.46.3
+      - wandb
+      - -e .

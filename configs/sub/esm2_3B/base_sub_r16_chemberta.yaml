@@ -1,0 +1,80 @@
+model:
+  enzyme:
+    type: esm2_t36_3B
+    cpt_checkpoint: null
+    freeze_backbone: true
+    lora:
+      enabled: true
+      rank: 16
+      alpha: 32
+      dropout: 0.1
+      target_modules: ["q_proj", "v_proj"]
+
+  substrate:
+    type: chemberta
+    freeze: true
+    model_name: seyonec/ChemBERTa-zinc-base-v1
+    molclr_pretrained_path: checkpoints/external/molclr_model.pth
+    molclr_emb_dim: 300
+    molclr_feat_dim: 512
+    molclr_num_layers: 5
+    molclr_drop_ratio: 0.0
+    molclr_pool: mean
+    ecfp_radius: 2
+    ecfp_n_bits: 2048
+
+  projection_dim: 256
+  projection_dropout: 0.1
+
+task:
+  weight_pref: 0.15
+  weight_type: 0.05
+  weight_contrast: 0.8
+  reg_loss_type: huber
+  huber_delta: 1.0
+  temperature: 0.07
+  pref_dim: 11
+  num_substrate_types: 8
+  num_pos_samples: 4
+  num_neg_samples: 16
+  neg_sampling: random
+
+  preserve:
+    enabled: false
+    monitor_only: false
+    pool_weight: 0.0
+    token_weight: 0.0
+    use_pool_preserve: true
+    use_token_preserve: false
+    cache_dir: ./sub/preserve_cache
+    force_rebuild: false
+    cache_batch_size: 8
+
+data:
+  oed_data: data/sub/oed.csv
+  enzyme_stats: data/sub/oed_enzyme_stats.csv
+  normalize_pref: true
+  pref_log_transform: true
+  max_seq_length: 1022
+  split_method: random
+  cluster_file: null
+  seq_identity_threshold: 0.3
+  train_ratio: 0.9
+
+training:
+  batch_size: 2
+  epochs: 20
+  lr: 0.0001
+  weight_decay: 0.01
+  warmup_epochs: 2
+  grad_clip: 1.0
+  accumulation_steps: 8
+  fp16: true
+  device: cuda:0
+  num_workers: 2
+  output_dir: artifacts/sub/esm2_t36_3B
+  exp_name: base_sub_r16_chemberta
+  save_every: 1
+  use_wandb: false
+  wandb_project: EnzSub_esm2_t36_3B
+  seed: 2026

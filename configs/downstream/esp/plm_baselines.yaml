@@ -1,0 +1,93 @@
+# Frozen external-PLM baselines for ESP enzyme-substrate binding prediction.
+#
+# Run:
+#   python tasks/downstream/esp/sweep.py \
+#     --config configs/downstream/esp/plm_baselines.yaml
+#
+# These models reuse the same residue-only mean-pooling policy as the EC PLM
+# baselines and write their protein representations to the existing
+# `enzyme_vector` column. The ESP MLP evaluation path is otherwise unchanged.
+
+experiment:
+  name: plm_baselines
+  results_root: artifacts/downstream/esp/paper-results
+
+device: "cuda:0"
+max_len: 1022
+batch_size: 4
+token_budget: 4096
+max_batch_size: 16
+
+data:
+  train_pkl: artifacts/downstream/esp/data/train.pkl
+  test_sets:
+    ID_Test: artifacts/downstream/esp/data/test.pkl
+
+models:
+  ankh3_large:
+    source: external_plm
+    mode: base
+    backend: hf_t5
+    model_id: ElnaggarLab/ankh3-large
+    # local_path: artifacts/external_models/ankh3-large
+    model_class: t5_encoder
+    tokenizer_class: t5
+    input_mode: raw
+    prefix: "[NLU]"
+    dtype: bfloat16
+    batch_size: 2
+    token_budget: 2048
+    max_batch_size: 4
+
+  prott5_xl:
+    source: external_plm
+    mode: base
+    backend: hf_t5
+    model_id: Rostlab/prot_t5_xl_half_uniref50-enc
+    # local_path: artifacts/external_models/prot_t5_xl_half_uniref50-enc
+    model_class: t5_encoder
+    tokenizer_class: t5
+    input_mode: space_separated
+    dtype: float16
+    batch_size: 4
+    token_budget: 4096
+    max_batch_size: 8
+
+  esm3_small:
+    source: external_plm
+    mode: base
+    backend: esm3
+    model_id: biohub/esm3-sm-open-v1
+    pretrained_name: esm3-sm-open-v1
+    dtype: bfloat16
+    batch_size: 1
+    token_budget: 0
+    max_batch_size: 1
+
+# ECFP and the downstream MLP settings match the current ESP paper configs.
+# ChemBERTa generation is disabled because it is not used by this MLP run.
+chemberta:
+  enabled: false
+
+eval:
+  methods: [mlp]
+  seeds: [2026, 2025, 3047]
+  cv: false
+  cv_splits: 5
+  mol_feature: ecfp
+
+  mlp:
+    hidden_dims: [512, 256, 128]
+    dropout: 0.4
+    use_residual: false
+    lr: 0.0005
+    weight_decay: 1.0e-4
+    batch_size: 128
+    max_epochs: 100
+    patience: 5
+    clip_grad: 1.0
+    torch_device: "cuda:0"
+
+knn:
+  k_values: [1]
+  batch_size: 256

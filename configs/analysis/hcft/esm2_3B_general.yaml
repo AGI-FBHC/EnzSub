@@ -1,0 +1,30 @@
+common:
+  ec_level: 4
+  match_mode: any_overlap
+
+hcft_eval:
+  embedding_dirs:
+    esm2_3b_base: artifacts/downstream/ec/embeddings/esm2_t36_3B/esm2_t36_3B_base
+    esm2_3b_cpt: artifacts/downstream/ec/embeddings/esm2_t36_3B/paper/esm2_t36_3B_cpt
+    esm2_3b_base_sub: artifacts/downstream/ec/embeddings/esm2_t36_3B/base_sub_r16_reg015_type005_con08_ckpt5
+    esm2_3b_cpt_sub: artifacts/downstream/ec/embeddings/esm2_t36_3B/cpt_sub_r16_reg015_type005_con08_ckpt5
+
+  label_csv: data/ec/split100.csv
+  identity_pairs: artifacts/downstream/ec/hcft/identity_pairs/split100/pair_identity.csv
+  output_dir: artifacts/downstream/ec/hcft/experiments/3B_general
+
+  negative_mode: general
+
+  positive_max_identity: 40.0
+  negative_min_identity: 40.0
+  min_identity_margin: 10.0
+
+  n_neg_per_pos: 5
+  max_pos_per_anchor: 200
+  max_neg_per_anchor: 500
+  max_triplets_per_anchor: 1000
+  min_triplets_per_anchor: 10
+  n_seeds: 1
+  baseline_name: esm2_3b_base
+  chunk_size: 100000
+  save_triplets: false
