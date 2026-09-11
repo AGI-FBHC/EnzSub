@@ -1,0 +1,76 @@
+{
+  "paths": {
+    "split_dir": "artifacts/transfer/reactzyme/data",
+    "mat_checkpoint": "checkpoints/external/reactzyme_mat.pt",
+    "enzsub_code_root": "src",
+    "artifacts_dir": "embeddings/transfer/ReactZyme/artifacts",
+    "results_dir": "artifacts/transfer/reactzyme/results/reproduction_10seed"
+  },
+  "runtime": {
+    "python_bin": "python",
+    "device": "cuda:0",
+    "split_name": "seq_smi"
+  },
+  "models": [
+    {
+      "name": "reactzyme_esm2_650m",
+      "kind": "reactzyme_esm",
+      "checkpoint": "checkpoints/external/reactzyme_esm2_650M.pt",
+      "max_length": 1022
+    },
+    {
+      "name": "enzsub_3b",
+      "kind": "enzsub",
+      "checkpoint": "checkpoints/sub/esm2_3B_cpt_sub.pt",
+      "model_mode": "cpt_sub",
+      "encoder_type": "esm2_t36_3B",
+      "batch_size": 1
+    },
+    {
+      "name": "enzsub_06b",
+      "kind": "enzsub",
+      "checkpoint": "checkpoints/sub/esm2_650M_cpt_sub.pt",
+      "model_mode": "cpt_sub",
+      "encoder_type": "esm2_t33_650M",
+      "batch_size": 4
+    },
+    {
+      "name": "enzsub_04b",
+      "kind": "enzsub",
+      "checkpoint": "checkpoints/sub/protbert_cpt_sub.pt",
+      "model_mode": "cpt_sub",
+      "encoder_type": "protbert_bfd",
+      "batch_size": 4
+    }
+  ],
+  "comparison_models": [
+    "reactzyme_esm2_650m",
+    "enzsub_3b",
+    "enzsub_06b",
+    "enzsub_04b"
+  ],
+  "negative_sampling": {
+    "method": "reactzyme_reaction_similarity",
+    "seed": 2025,
+    "per_positive": 1,
+    "candidate_pool": 1000,
+    "selection": "uniform_eligible_from_top_pool",
+    "candidate_scope": "all_unique_positive_reactions_from_train_and_test",
+    "exclusion_scope": "all_positive_pairs_from_train_and_test",
+    "enzyme_side": "excluded_pending_official_implementation"
+  },
+  "training": {
+    "seeds": [2025, 2026, 3047, 42, 4096, 2027, 3048, 73, 4097, 8192],
+    "batch_size": 512,
+    "accumulation_steps": 1,
+    "max_epochs": 50,
+    "patience": 5,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.001,
+    "validation_fraction": 0.1
+  },
+  "evaluation": {
+    "metrics": ["map", "ndcg", "topk"],
+    "topk": [1, 3, 5, 10]
+  }
+}

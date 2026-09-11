@@ -9,6 +9,8 @@ PYTHON_BIN="${PYTHON_BIN:-python}"
 DEVICE="${DEVICE:-cuda:0}"
 TASKS="${TASKS:-kcat km kcat_km}"
 ENZSUB_CODE_DIR="${REPO_ROOT}/src"
+DATA_DIR="${DATA_DIR:-${REPO_ROOT}/artifacts/transfer/unikp/data}"
+FEATURE_ROOT="${FEATURE_ROOT:-${REPO_ROOT}/embeddings/transfer/UniKP}"
 PROT_T5_PATH="${PROT_T5_PATH:-Rostlab/prot_t5_xl_uniref50}"
 PROT_T5_CACHE_DIR="${PROT_T5_CACHE_DIR:-}"
 PROT_T5_LOCAL_FILES_ONLY="${PROT_T5_LOCAL_FILES_ONLY:-0}"
@@ -40,7 +42,7 @@ run_comparison() {
   local feature_cache="${8:-}"
   local prott5_feature_cache="${9:-}"
 
-  if [[ ! -f "${checkpoint}" ]]; then
+  if [[ ! -f "${feature_cache}" && ! -f "${checkpoint}" ]]; then
     echo "[error] Checkpoint not found: ${checkpoint}" >&2
     return 1
   fi
@@ -67,6 +69,7 @@ run_comparison() {
   fi
   "${PYTHON_BIN}" compare_prott5_enzsub_unikp.py \
     --task "${task}" \
+    --data-dir "${DATA_DIR}" \
     "${PROT_T5_ARGS[@]}" \
     --encoder-type "${encoder_type}" \
     --model-mode "${model_mode}" \
@@ -95,8 +98,8 @@ for task in ${TASKS}; do
     "${ESM2_650M_CHECKPOINT}" \
     16 \
     8 \
-    "embedding_comparison_outputs_650m/${task}/${task}_features_enzsub_cpt_sub.pkl" \
-    "embedding_comparison_outputs_650m/${task}/${task}_features_unikp_prott5.pkl"
+    "${FEATURE_ROOT}/${task}/esm2_650m_cpt_sub_epoch15/${task}_features_enzsub_cpt_sub.pkl" \
+    "${FEATURE_ROOT}/${task}/esm2_650m_cpt_sub_epoch15/${task}_features_unikp_prott5.pkl"
 
   run_comparison \
     "${task}" \
@@ -106,8 +109,8 @@ for task in ${TASKS}; do
     "${PROTBERT_CHECKPOINT}" \
     4 \
     8 \
-    "embedding_comparison_outputs_protbert/${task}/protbert_bfd_cpt_sub/${task}_features_enzsub_cpt_sub.pkl" \
-    "embedding_comparison_outputs_protbert/${task}/protbert_bfd_cpt_sub/${task}_features_unikp_prott5.pkl"
+    "${FEATURE_ROOT}/${task}/protbert_bfd_cpt_sub_epoch15/${task}_features_enzsub_cpt_sub.pkl" \
+    "${FEATURE_ROOT}/${task}/protbert_bfd_cpt_sub_epoch15/${task}_features_unikp_prott5.pkl"
 
   run_comparison \
     "${task}" \
@@ -117,8 +120,8 @@ for task in ${TASKS}; do
     "${ESM2_3B_CHECKPOINT}" \
     16 \
     4 \
-    "" \
-    "embedding_comparison_outputs/${task}/${task}_features_unikp_prott5.pkl"
+    "${FEATURE_ROOT}/${task}/esm2_3b_cpt_sub_epoch5/${task}_features_enzsub_cpt_sub.pkl" \
+    "${FEATURE_ROOT}/${task}/esm2_3b_cpt_sub_epoch5/${task}_features_unikp_prott5.pkl"
 done
 
 echo "[done] All comparisons finished"
