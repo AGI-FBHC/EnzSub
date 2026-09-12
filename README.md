@@ -1,61 +1,129 @@
 # EnzSub
 
-EnzSub adapts pretrained protein language models to enzyme sequences and
-substrate-aware objectives. This repository contains the code and formal
-configurations used for continued pretraining (CPT), substrate-aware training
-(SUB), downstream evaluation, transfer benchmarks, and representation analyses.
+EnzSub adapts pretrained protein language models to enzyme sequences through
+continued pretraining (CPT) and substrate-aware training (SUB). This repository
+contains the paper-oriented training code, formal configurations, downstream
+evaluation code, transfer benchmarks, and representation analyses.
 
-The release is organized for paper reproduction rather than as a copy of the
-internal research workspace. Large checkpoints, embeddings, processed benchmark
-tables, and generated results are distributed separately; their expected paths
-are recorded in `data/manifest.yaml`.
+The release is a curated reproduction repository rather than a copy of the
+internal research workspace. Precomputed embeddings and final CPT-SUB
+checkpoints are hosted separately on Hugging Face.
 
-## Release status
+## What is included
 
-- Training and evaluation code: included.
-- Paper-main CPT and SUB configurations: included for ESM2-650M, ESM2-3B, and
-  ProtBERT-BFD.
-- Small pH, Tm, active-site, and RNS inputs: included.
-- CPT/SUB training data, EC/ESP benchmark artifacts, checkpoints, and released
-  result tables: pending the public data archive.
+- CPT and SUB training code for ESM-2 650M, ESM-2 3B, and ProtBERT-BFD.
+- Main Base-SUB and CPT-SUB configurations for all three backbones.
+- Reproduction entry points for EC, enzyme-substrate specificity (ESP),
+  active-site prediction, optimum pH, and melting temperature.
+- ReactZyme, Seq2Topt, and UniKP transfer comparisons.
+- HCFT, substrate-neighborhood coherence, and Random Neighbor Score analyses.
+- Small evaluation inputs for EC, pH, Tm, active-site prediction, and RNS.
 
-Until the archive record is added to `data/manifest.yaml`, the repository can be
-validated and inspected but cannot reproduce every reported number from a fresh
-checkout.
+Large embeddings and checkpoints are not tracked by Git. The currently released
+artifacts are:
+
+- [EnzSub embeddings](https://huggingface.co/datasets/chaohua06/EnzSub-Embeddings)
+- [EnzSub checkpoints](https://huggingface.co/chaohua06/EnzSub)
+
+The CPT and SUB training datasets will be released separately. Training from a
+fresh base model therefore remains unavailable until those files are published;
+the released embeddings are sufficient for the streamlined downstream
+reproduction commands below.
 
 ## Repository layout
 
 ```text
-configs/                 training, downstream, and analysis configurations
-data/                    small versioned inputs and the external-artifact manifest
-docs/reproduction.md     staged reproduction guide and evidence boundaries
+configs/                 formal training, downstream, and analysis configurations
+data/                    versioned inputs and external-artifact manifest
+docs/reproduction.md     complete reproduction guide and evidence boundaries
 scripts/                 repository validation utilities
 src/enzsub/              CPT and SUB implementation
 tasks/downstream/        EC, ESP, active-site, pH, and Tm evaluations
 tasks/transfer/          ReactZyme, Seq2Topt, and UniKP comparisons
 tasks/analysis/rns/      Random Neighbor Score analysis
-artifacts/               generated outputs, excluded from version control
+embeddings/              download target for released representations
+checkpoints/             download target for released model weights
+artifacts/               generated outputs; excluded from version control
 ```
 
-## Installation
+## Environment
 
-The main experiments were developed for Linux with CUDA. Create the environment
-and install the local package from the repository root:
+The experiments were run on Linux with Python 3.8.19, PyTorch 2.1.2, and CUDA
+12.1. Create the public environment from the repository root:
 
 ```bash
 conda env create -f environment.yml
 conda activate enzsub
-python -m pip install -e .
 python scripts/validate_repository.py
 ```
 
-PyTorch/CUDA compatibility depends on the local driver. If the pinned CUDA build
-cannot be installed on a target machine, install a compatible PyTorch build first
-and then install the remaining dependencies.
+The environment file is a minimal reproducible specification derived from the
+original `esm_env`; it intentionally excludes unrelated packages accumulated in
+that research environment. A CUDA-capable Linux system is required for ESP,
+active-site prediction, and full CPT/SUB training. EC, pH, and Tm can be run on
+CPU from released embeddings.
+
+## Download released artifacts
+
+Install the Hugging Face CLI if it is not already available, then download the
+embeddings directly into the path expected by the public configurations:
+
+```bash
+hf download chaohua06/EnzSub-Embeddings \
+  --repo-type dataset \
+  --local-dir embeddings
+```
+
+The complete embedding collection requires approximately 90 GiB of disk space.
+To download only the ESM-2 650M EC files for the quickest smoke reproduction:
+
+```bash
+hf download chaohua06/EnzSub-Embeddings \
+  --repo-type dataset \
+  --include "ec/06B/**" \
+  --local-dir embeddings
+```
+
+The model repository contains the final CPT-SUB checkpoints for ProtBERT-BFD
+(`04B`), ESM-2 650M (`06B`), and ESM-2 3B (`3B`):
+
+```bash
+hf download chaohua06/EnzSub --local-dir checkpoints/released
+```
+
+These final checkpoints are not required by the embedding-only commands below.
+See [the reproduction guide](docs/reproduction.md) for the artifact boundary and
+expected directory layout.
+
+## Reproduce the main ESM-2 650M downstream results
+
+Run all commands from the repository root. EC is deterministic and uses the
+paper setting `k=1` to evaluate Base, CPT, Base-SUB, and CPT-SUB on NEW-392 and
+PRICE-149:
+
+```bash
+python knn_ec.py --config config_enzsub06B.yaml
+```
+
+The other streamlined entry points reuse the same four released representation
+states and the paper seeds:
+
+```bash
+python ph.py --config config_ph_enzsub06B.yaml
+python tm.py --config config_tm_enzsub06B.yaml
+CUDA_VISIBLE_DEVICES=0 python esp.py --config config_esp_enzsub06B.yaml
+CUDA_VISIBLE_DEVICES=0 python active_site.py --config config_active_site_enzsub06B.yaml
+```
+
+Generated tables and task checkpoints are written under `artifacts/`. The pH
+and Tm entry points train fixed XGBoost readouts on CPU. ESP and active-site
+prediction train fixed MLP readouts on the selected GPU. None of these commands
+regenerates protein embeddings.
 
 ## Training
 
-Run ESM2 CPT with one or more GPUs:
+After the CPT/SUB training data are released under `data/cpt/` and `data/sub/`,
+ESM-2 CPT can be launched with one or more GPUs:
 
 ```bash
 python -m enzsub.cpt.esm2.train_random_cpt_ddp \
@@ -63,7 +131,7 @@ python -m enzsub.cpt.esm2.train_random_cpt_ddp \
   --gpus 0,1
 ```
 
-ProtBERT-BFD uses the corresponding entry point:
+ProtBERT-BFD uses its corresponding entry point:
 
 ```bash
 python -m enzsub.cpt.protbert.train_protbert_random_cpt_ddp \
@@ -71,60 +139,48 @@ python -m enzsub.cpt.protbert.train_protbert_random_cpt_ddp \
   --gpus 0,1
 ```
 
-Run SUB after placing the released inputs and checkpoints at the paths declared
-by the selected configuration:
+Run SUB with the matching CPT checkpoint and formal configuration:
 
 ```bash
 python -m enzsub.sub.train \
   --config configs/sub/esm2_650M/cpt_sub_r16_reg015_type005_con08_ep15.yaml
 ```
 
-The same entry point accepts every Base-SUB and CPT-SUB configuration under
-`configs/sub/`.
+The same entry point accepts the Base-SUB and CPT-SUB configurations under
+`configs/sub/`. Hardware-dependent batch size or GPU indices may be changed;
+optimization, data split, seed, and metric settings must remain unchanged for a
+paper-equivalent reproduction.
 
-## Evaluation and analyses
+## Transfer benchmarks and analyses
 
-The ESM2-650M EC-number results can be reproduced directly from the released
-embeddings. No model checkpoint, GPU, or embedding-generation step is required:
-
-```bash
-python knn_ec.py --config config_enzsub06B.yaml
-```
-
-This command evaluates Base, CPT, Base-SUB, and CPT-SUB on NEW-392 and
-PRICE-149 with the paper setting `k=1`. It also checks every MCC value against
-the archived paper run and writes the full metric table under `artifacts/`.
-
-The ESM2-650M optimum-pH, ESP, Tm, and active-site results use the same
-released-embedding layout and the three paper seeds:
+Task-specific commands and required external assets are documented under
+`tasks/transfer/`, `tasks/downstream/`, and `tasks/analysis/`. The unified
+transfer launcher preserves the repeated-evaluation protocols used for
+ReactZyme, Seq2Topt, and UniKP:
 
 ```bash
-python ph.py --config config_ph_enzsub06B.yaml
-python esp.py --config config_esp_enzsub06B.yaml
-python tm.py --config config_tm_enzsub06B.yaml
-python active_site.py --config config_active_site_enzsub06B.yaml
+PHYSICAL_GPU=0 bash tasks/transfer/run_transfer_reproduction.sh
 ```
 
-The pH and Tm commands train their fixed XGBoost readouts on CPU. ESP and
-active-site train the fixed MLP readouts on the configured GPU. None of these
-commands regenerates protein or molecular embeddings.
+HCFT reuses EC representations, substrate-neighborhood coherence reuses ESP
+representations, and RNS uses its dedicated released representation set. CLEAN
+is intentionally excluded from this repository.
 
-Task-specific commands and artifact requirements are documented under
-`tasks/downstream/`, `tasks/transfer/`, and `tasks/analysis/`. The downstream
-collection covers EC prediction, enzyme-substrate specificity, active-site
-prediction, optimum pH, and melting temperature. HCFT and substrate-neighborhood
-coherence remain task-specific analyses; Random Neighbor Score is a separate
-representation-level analysis.
+## Reproducibility boundary
 
-See `docs/reproduction.md` for the recommended stage order and the distinction
-between static validation, completed inference, and reproduced paper results.
+`python scripts/validate_repository.py` performs static source, YAML, shell, and
+path checks. It does not run model inference. A paper result is reproduced only
+when the released inputs, model state, split, seed, metric definition, and final
+metric table agree. See [docs/reproduction.md](docs/reproduction.md) for the
+recommended verification order.
 
-## Authors and attribution
+## Authors, citation, and license
 
-EnzSub code is maintained by **JkBai** and the **AGI&FBHC Laboratory**.
-Transfer evaluations include adapted code from ReactZyme, Seq2Topt, and UniKP;
-their upstream repositories and licenses are listed in
-`THIRD_PARTY_NOTICES.md`.
+EnzSub is maintained by **JkBai** and the **AGI&FBHC Laboratory**. Adapted
+third-party transfer code and upstream licenses are listed in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
-The EnzSub citation, public archive DOI, and project license must be added before
-the GitHub release is made public.
+The manuscript citation and DOI will be added after publication. No EnzSub
+software or data license has yet been granted; source availability alone does
+not grant permission to reuse, modify, or redistribute the project. A license
+file will be added after the authors complete the licensing review.

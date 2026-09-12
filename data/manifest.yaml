@@ -1,12 +1,30 @@
 schema_version: 1
-release_status: artifact_pending
-archive:
-  provider: Zenodo
-  record: null
-  doi: null
-  checksum_manifest: null
+release_status: partial_artifacts_available
+
+archives:
+  embeddings:
+    provider: Hugging Face
+    repository: chaohua06/EnzSub-Embeddings
+    repository_type: dataset
+    url: https://huggingface.co/datasets/chaohua06/EnzSub-Embeddings
+    local_path: embeddings
+    status: available
+    doi: null
+    checksum_manifest: null
+  checkpoints:
+    provider: Hugging Face
+    repository: chaohua06/EnzSub
+    repository_type: model
+    url: https://huggingface.co/chaohua06/EnzSub
+    local_path: checkpoints/released
+    status: available
+    doi: null
+    checksum_manifest: null
 
 repository_data:
+  - name: ec_labels
+    path: data/ec
+    used_by: [ec, hcft]
   - name: ph_labels_and_sequences
     path: data/ph
     used_by: [ph]
@@ -21,6 +39,27 @@ repository_data:
     used_by: [rns]
 
 external_artifacts:
+  - name: released_embeddings
+    path: embeddings
+    used_by:
+      - ec
+      - esp
+      - active_site
+      - ph
+      - tm
+      - hcft
+      - substrate_coherence
+      - rns
+      - ReactZyme
+      - Seq2Topt
+      - UniKP
+    status: available
+    archive: embeddings
+  - name: final_cpt_sub_checkpoints
+    path: checkpoints/released
+    used_by: [downstream, transfer, rns]
+    status: available
+    archive: checkpoints
   - name: cpt_training_data
     path: data/cpt
     used_by: [cpt]
@@ -29,27 +68,12 @@ external_artifacts:
     path: data/sub
     used_by: [sub]
     status: pending_release
-  - name: ec_data_embeddings_and_results
-    path: data/ec
-    additional_paths:
-      - artifacts/downstream/ec
-    used_by: [ec, hcft]
+  - name: intermediate_cpt_checkpoints
+    path: checkpoints/cpt
+    used_by: [cpt_sub_training]
     status: pending_release
-  - name: esp_processed_data_embeddings_and_results
-    path: data/esp
-    additional_paths:
-      - artifacts/downstream/esp
-    used_by: [esp, substrate_coherence]
-    status: pending_release
-  - name: model_checkpoints
-    path: checkpoints
-    used_by: [sub, downstream, transfer, rns]
-    status: pending_release
-  - name: transfer_benchmark_data_and_results
-    path: artifacts/transfer
-    used_by: [ReactZyme, Seq2Topt, UniKP]
-    status: pending_release
-  - name: rns_results_and_embeddings
-    path: artifacts/analysis/rns
-    used_by: [rns]
-    status: pending_release
+
+generated_outputs:
+  path: artifacts
+  tracked_by_git: false
+  status: generated_locally

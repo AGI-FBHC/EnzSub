@@ -1,31 +1,41 @@
 # EnzSub embedding archive
 
-This directory stages the precomputed representations used by the EnzSub
-downstream and analysis workflows. The files are copied from the original
-experiment directories; the sources remain unchanged.
+Precomputed representations are hosted at
+[chaohua06/EnzSub-Embeddings](https://huggingface.co/datasets/chaohua06/EnzSub-Embeddings).
+Download them from the repository root so the archive contents are placed
+directly in this directory:
+
+```bash
+hf download chaohua06/EnzSub-Embeddings \
+  --repo-type dataset \
+  --local-dir embeddings
+```
 
 ## Layout
 
-- `ec/`: EC classification embeddings for ProtBERT-BFD, ESM-2 650M, and
-  ESM-2 3B. Each backbone includes `base`, `cpt`, `base_sub`, and `cpt_sub`.
-- `esp/`: enzyme embeddings used by the enzyme-substrate specificity task.
+- `ec/`: EC classification embeddings for ProtBERT-BFD, ESM-2 650M, and ESM-2
+  3B, with Base, CPT, Base-SUB, and CPT-SUB states.
+- `esp/`: enzyme-substrate tables and enzyme embeddings used by ESP.
 - `as/`: per-residue embeddings used by active-site prediction.
 - `pH/` and `tm/`: sequence-level embeddings used by the two regression tasks.
-- `transfer/ReactZyme/`: the four models in the main ReactZyme configuration,
-  together with the MAT reaction embeddings required by that workflow.
+- `transfer/ReactZyme/`: protein and MAT reaction features used by ReactZyme.
 - `transfer/Seq2Topt/`: precomputed per-sequence feature caches.
-- `transfer/UniKP/`: EnzSub/UniKP feature matrices and sequence caches for the
-  kcat, Km, and joint kcat/Km comparisons.
-- `rns/`: base and CPT representations plus metadata for Random Neighbor Score
-  analysis.
+- `transfer/UniKP/`: EnzSub/UniKP feature matrices and sequence caches.
+- `rns/`: base and comparison representations used by Random Neighbor Score.
 
-HCFT reuses the EC embeddings, and substrate-neighborhood coherence reuses the
-ESP embeddings; these representations are not duplicated. CLEAN artifacts are
-not included.
+HCFT reuses EC embeddings, and substrate-neighborhood coherence reuses ESP
+embeddings; those files are not duplicated. CLEAN artifacts are not included.
 
-The pre-existing `as/0.4B/protbert_bfd_*` checkpoint-selection directories are
-legacy selection artifacts, not part of the four-state main comparison. They
-have been retained because this organization pass was copy-only.
+The complete archive requires approximately 90 GiB of disk space. Hugging Face
+supports selective downloads; for example, only the ESM-2 650M EC subset can be
+installed with:
 
-No project-level data license is granted by this staging directory. Add the
-chosen data license and repository record before public release.
+```bash
+hf download chaohua06/EnzSub-Embeddings \
+  --repo-type dataset \
+  --include "ec/06B/**" \
+  --local-dir embeddings
+```
+
+No EnzSub data license has yet been granted. The archive is publicly readable,
+but reuse and redistribution permissions will be defined in a later release.
