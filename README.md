@@ -24,11 +24,12 @@ artifacts are:
 
 - [EnzSub embeddings](https://huggingface.co/datasets/chaohua06/EnzSub-Embeddings)
 - [EnzSub checkpoints](https://huggingface.co/chaohua06/EnzSub)
+- [EnzSub training and Tm data](https://huggingface.co/datasets/chaohua06/EnzSub-dataset)
 
-The CPT and SUB training datasets will be released separately. Training from a
-fresh base model therefore remains unavailable until those files are published;
-the released embeddings are sufficient for the streamlined downstream
-reproduction commands below.
+The released embeddings are sufficient for the streamlined downstream
+reproduction commands below. The training-data repository provides the ENZ30
+CPT split, processed OED SUB tables, and fixed Tm splits required by the public
+configurations. Other third-party benchmarks are not redistributed here.
 
 ## Repository layout
 
@@ -65,8 +66,16 @@ CPU from released embeddings.
 
 ## Download released artifacts
 
-Install the Hugging Face CLI if it is not already available, then download the
-embeddings directly into the path expected by the public configurations:
+Install the Hugging Face CLI if it is not already available. Download the
+training data directly into the path expected by the public configurations:
+
+```bash
+hf download chaohua06/EnzSub-dataset \
+  --repo-type dataset \
+  --local-dir data
+```
+
+Download the embeddings into their expected path:
 
 ```bash
 hf download chaohua06/EnzSub-Embeddings \
@@ -122,8 +131,8 @@ regenerates protein embeddings.
 
 ## Training
 
-After the CPT/SUB training data are released under `data/cpt/` and `data/sub/`,
-ESM-2 CPT can be launched with one or more GPUs:
+After downloading the training dataset under `data/`, ESM-2 CPT can be launched
+with one or more GPUs:
 
 ```bash
 python -m enzsub.cpt.esm2.train_random_cpt_ddp \

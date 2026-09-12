@@ -10,12 +10,11 @@ frozen ChemBERTa for ESM-2 3B and ProtBERT-BFD.
 The public release supports two distinct workflows:
 
 1. downstream and analysis reproduction from released embeddings;
-2. CPT/SUB training from the formal configurations once the training datasets
-   are released.
+2. CPT/SUB training from the released processed inputs and formal
+   configurations.
 
-The first workflow is currently available. The second remains data-blocked; the
-code and configurations are included, but `data/cpt/` and `data/sub/` have not
-yet been published.
+Both workflows are currently available. Third-party downstream benchmarks are
+not redistributed and must be obtained from their original repositories.
 
 ## Reference environment
 
@@ -35,6 +34,18 @@ repository validator confirms release structure and syntax only; it is not a
 GPU or numerical reproduction test.
 
 ## Artifact installation
+
+Download the EnzSub training and Tm data to the repository-relative paths used
+by the public configurations:
+
+```bash
+hf download chaohua06/EnzSub-dataset \
+  --repo-type dataset \
+  --local-dir data
+```
+
+This creates `data/cpt/`, `data/sub/`, and `data/tm/`. The dataset repository
+includes a SHA-256 manifest for all released files.
 
 Download all precomputed representations to the repository-relative path used
 by the public configurations:
@@ -111,8 +122,8 @@ documented in each task directory.
 
 ## CPT and SUB training
 
-Training requires the unreleased processed inputs under `data/cpt/` and
-`data/sub/`. Once available, the recommended sequence is:
+Training uses the released processed inputs under `data/cpt/` and `data/sub/`.
+The recommended sequence is:
 
 ```text
 1. Run CPT for the selected backbone, or install the matching CPT checkpoint.
@@ -139,5 +150,4 @@ not paper-equivalent reproductions.
 
 The repository intentionally excludes raw internal data-construction notebooks,
 exploratory runs, caches, and superseded configurations. Their absence does not
-change the released evaluation protocols, but training cannot be claimed as
-independently reproduced until the processed CPT and SUB inputs are published.
+change the released training or evaluation protocols.

@@ -1,7 +1,16 @@
 schema_version: 1
-release_status: partial_artifacts_available
+release_status: core_artifacts_available
 
 archives:
+  training_data:
+    provider: Hugging Face
+    repository: chaohua06/EnzSub-dataset
+    repository_type: dataset
+    url: https://huggingface.co/datasets/chaohua06/EnzSub-dataset
+    local_path: data
+    status: available
+    doi: null
+    checksum_manifest: checksums.sha256
   embeddings:
     provider: Hugging Face
     repository: chaohua06/EnzSub-Embeddings
@@ -63,11 +72,13 @@ external_artifacts:
   - name: cpt_training_data
     path: data/cpt
     used_by: [cpt]
-    status: pending_release
+    status: available
+    archive: training_data
   - name: sub_training_data
     path: data/sub
     used_by: [sub]
-    status: pending_release
+    status: available
+    archive: training_data
   - name: intermediate_cpt_checkpoints
     path: checkpoints/cpt
     used_by: [cpt_sub_training]
