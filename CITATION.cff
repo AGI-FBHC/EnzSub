@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the archived release and the accompanying article."
-title: "EnzSub: enzyme-domain continued pre-training and substrate-aware training for enzyme representation learning"
+title: "EnzSub: substrate supervision reorganizes enzyme representations by catalytic identity"
 type: software
 version: 1.0.1
 date-released: "2026-09-30"
