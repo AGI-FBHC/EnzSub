@@ -2,10 +2,11 @@ cff-version: 1.2.0
 message: "If you use this software, please cite the archived release and the accompanying article."
 title: "EnzSub: substrate supervision reorganizes enzyme representations by catalytic identity"
 type: software
-version: 1.0.1
+version: 1.0.2
 date-released: "2026-09-30"
 license: MIT
 repository-code: "https://github.com/AGI-FBHC/EnzSub"
+doi: "10.5281/zenodo.23044467"
 abstract: "Source code and experiment configurations for enzyme-domain continued pre-training, substrate-aware training, representation analyses and downstream numerical evaluations."
 authors:
   - family-names: Fang
