@@ -1,0 +1,65 @@
+{
+  "title": "EnzSub: enzyme-domain continued pre-training and substrate-aware training for enzyme representation learning",
+  "upload_type": "software",
+  "description": "Source code and experiment configurations for enzyme-domain continued pre-training (CPT), substrate-aware training (SUB), representation analyses and downstream numerical evaluations reported in the accompanying manuscript. The repository contains the training and evaluation pipeline, fixed data splits, experiment configuration files and reproduction instructions.",
+  "license": "MIT",
+  "access_right": "open",
+  "version": "1.0.0",
+  "language": "eng",
+  "keywords": [
+    "enzyme representation",
+    "protein language model",
+    "substrate supervision",
+    "enzyme function prediction",
+    "continued pre-training",
+    "representation learning"
+  ],
+  "creators": [
+    {
+      "name": "Fang, Chaohua",
+      "affiliation": "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+    },
+    {
+      "name": "Zhou, Rui",
+      "affiliation": "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+    },
+    {
+      "name": "Zhang, Ziqing",
+      "affiliation": "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+    },
+    {
+      "name": "Huang, Denan",
+      "affiliation": "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+    },
+    {
+      "name": "Deng, Zhaohong",
+      "affiliation": "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+    },
+    {
+      "name": "Mu, Wanmeng",
+      "affiliation": "School of Biotechnology, Jiangnan University, Wuxi 214122, China"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/AGI-FBHC/EnzSub",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://huggingface.co/chaohua06/EnzSub",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://huggingface.co/datasets/chaohua06/EnzSub-dataset",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://huggingface.co/datasets/chaohua06/EnzSub-Embeddings",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    }
+  ]
+}
