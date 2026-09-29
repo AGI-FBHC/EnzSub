@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software archive and the accompanying article."
+title: "EnzSub: enzyme-domain continued pre-training and substrate-aware training for enzyme representation learning"
+abstract: >-
+  Source code and experiment configurations for enzyme-domain continued pre-training (CPT),
+  substrate-aware training (SUB), representation analyses and downstream numerical evaluations
+  reported in the accompanying manuscript "Substrate supervision reorganizes protein language
+  model representations of enzymes by catalytic identity".
+type: software
+version: 1.0.0
+date-released: "2026-09-30"
+license: MIT
+license-url: "https://opensource.org/licenses/MIT"
+repository-code: "https://github.com/AGI-FBHC/EnzSub"
+url: "https://github.com/AGI-FBHC/EnzSub"
+keywords:
+  - enzyme representation
+  - protein language model
+  - substrate supervision
+  - enzyme function prediction
+  - continued pre-training
+authors:
+  - family-names: Fang
+    given-names: Chaohua
+    affiliation: "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+  - family-names: Zhou
+    given-names: Rui
+    affiliation: "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+  - family-names: Zhang
+    given-names: Ziqing
+    affiliation: "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+  - family-names: Huang
+    given-names: Denan
+    affiliation: "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+  - family-names: Deng
+    given-names: Zhaohong
+    affiliation: "School of Artificial Intelligence and Computer Science, Jiangnan University, Wuxi 214122, China"
+    email: dengzhaohong@jiangnan.edu.cn
+    corresponding: true
+  - family-names: Mu
+    given-names: Wanmeng
+    affiliation: "School of Biotechnology, Jiangnan University, Wuxi 214122, China"
+    email: wmmu@jiangnan.edu.cn
+    corresponding: true
+# TODO (optional): add ORCID iDs, e.g.  orcid: "https://orcid.org/0000-0002-XXXX-XXXX"
+# TODO (fill after Zenodo archiving): identifiers:
+#   - type: doi
+#     value: 10.5281/zenodo.XXXXXXX
+#     description: "Archived release of this software"
